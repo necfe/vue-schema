@@ -1,0 +1,27 @@
+{
+    "name": "configurable",
+    "description": "Configurable Components",
+    "version": "0.2.0",
+    "author": "Rainfore <rainforest92@126.com>",
+    "main": "./index.js",
+    "scripts": {
+      "precommit": "bash node_modules/vusion-hooks/pre-commit"
+    },
+    "license": "MIT",
+    "keywords": [
+      "config",
+      "configurable",
+      "component",
+      "vue"
+    ],
+    "tags": [
+      "config",
+      "configurable",
+      "component",
+      "vue"
+    ],
+    "dependencies": {
+    },
+    "devDependencies": {
+    }
+  }
