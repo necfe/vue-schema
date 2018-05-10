@@ -1,5 +1,5 @@
 {
-    "name": "vue-schema",
+    "name": "@necfe/vue-schema",
     "description": "Schema for rendering vue component",
     "version": "0.3.0",
     "author": "Rainfore <rainforest92@126.com>",
