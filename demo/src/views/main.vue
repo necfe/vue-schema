@@ -1,8 +1,7 @@
 <template>
 <section :class="$style.banner">
     <div :class="$style.bannerContent">
-        <h1 :class="$style.heading">Hello World！</h1>
-        <h2 :class="$style.subtitle">Welcome to Vusion App</h2>
+        <h1 :class="$style.heading">Vue Schema</h1>
     </div>
 </section>
 </template>
@@ -10,7 +9,6 @@
 <style module>
 .banner {
     height: 480px;
-    background: #f0f6fa;
     color: #676975;
 }
 

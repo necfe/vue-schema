@@ -1,7 +1,7 @@
 {
-    "name": "configurable",
-    "description": "Configurable Components",
-    "version": "0.2.0",
+    "name": "vue-schema",
+    "description": "Schema for rendering vue component",
+    "version": "0.3.0",
     "author": "Rainfore <rainforest92@126.com>",
     "main": "./index.js",
     "scripts": {
@@ -9,18 +9,19 @@
     },
     "license": "MIT",
     "keywords": [
-      "config",
+      "schema",
       "configurable",
       "component",
       "vue"
     ],
     "tags": [
-      "config",
+      "schema",
       "configurable",
       "component",
       "vue"
     ],
     "dependencies": {
+      "lodash": "^4.17.4"
     },
     "devDependencies": {
       "eslint": "^4.13.1",
