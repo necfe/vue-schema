@@ -1,0 +1,27 @@
+{
+    "version": "0.3.0",
+    "uiSchema": {
+        "tag": "u-linear-layout",
+        "direction": "vertical",
+        "children": [{
+            "tag": "div",
+            "children": [{
+                "tag": "span",
+                "text": "这里汇聚了你在网易云基础服务上的所有云硬盘和快照实例。"
+            }, {
+                "tag": "u-link",
+                "text": "如何创建云硬盘实例？"
+            }]
+        }, {
+            "tag": "u-linear-layout",
+            "children": [{
+                "tag": "u-button",
+                "color": "primary",
+                "text": "立即创建"
+            }, {
+                "tag": "u-button",
+                "text": "设 置"
+            }]
+        }]
+    }
+}

@@ -1,7 +1,11 @@
 import at from 'lodash/at';
+// import merge from 'lodash/merge';
 
 const VUE_RESERVED_WORDS = 'class,style,attrs,props,domProps,on,nativeOn,directives,scopedSlots,slot,key,ref'.split(',');
 const SCHEMA_RESERVED_WORDS = 'tag,bindingAttrs,bindingText,parent,child,children,text,others'.split(',');
+const SIMPLE_WORDS = 'tag,text,bindingText,slot,key,ref'.split(',');
+const OBJECT_WORDS = 'class,style,attrs,bindingAttrs,props,domProps,on,nativeOn,directives,scopedSlots,others'.split(',');
+const ARRAY_WORDS = 'directives'.split(',');
 
 const guessChildName = (name) => {
     if (name.endsWith('s'))
@@ -10,25 +14,6 @@ const guessChildName = (name) => {
         return name.slice(0, -2);
     else
         return name + '-item';
-};
-
-/**
- *
- * @param {*} condition
- * 数组为或，对象为与，不允许有函数
- */
-const resolveCondition = (condition, context) => {
-    if (Array.isArray(condition))
-        return condition.some((cond) => resolveCondition(cond, context));
-    else if (typeof condition === 'object') {
-        return Object.keys(condition).every((key) => {
-            if (key[0] === '!')
-                return at(context, key.slice(1))[0] !== condition[key];
-            else
-                return at(context, key)[0] === condition[key];
-        });
-    } else
-        return !!condition;
 };
 
 class UINode {
@@ -57,11 +42,9 @@ class UINode {
     constructor(ui, parent) {
         // @TODO: 先不处理自己处理自己的情况
 
-        if (!ui.tag) {
-            if (!parent)
-                throw new Error('父组件为空，无法从父组件猜测子组件的名称！');
+        if (!ui.tag && parent)
             this.tag = guessChildName(parent.tag);
-        } else
+        else
             this.tag = ui.tag;
 
         this.parent = parent;
@@ -74,6 +57,7 @@ class UINode {
         // 都用 attrs，props 只能使用在 JS 中声明过的，有一些属性单纯是样式扩充
         this.attrs = ui.attrs || {};
         this.bindingAttrs = ui.bindingAttrs || {};
+        this.bindingText = ui.bindingText;
 
         Object.keys(ui).forEach((key) => {
             if (!(VUE_RESERVED_WORDS.includes(key) || SCHEMA_RESERVED_WORDS.includes(key))) {
@@ -110,6 +94,38 @@ class UINode {
     // get hasChild() {
     //     return !!(this.children && this.children.length);
     // }
+
+    merge(ui) {
+        // return merge(this, ui);
+        // 允许后者将前者的tag直接覆盖
+        SIMPLE_WORDS.forEach((word) => this[word] = ui[word] === undefined ? this[word] : ui[word]);
+        OBJECT_WORDS.forEach((word) => this[word] = Object.assign({}, this[word], ui[word]));
+        ARRAY_WORDS.forEach((word) => this[word] = [].concat(this[word] || [], ui[word] || []));
+
+        // const uiNode = new UINode(ui, parent);
+
+        const maxLength = Math.max(this.children.length, ui.children.length);
+
+        for (let i = 0; i < maxLength; i++) {
+            const child1 = this.children[i];
+            const child2 = ui.children[i];
+
+            if (child1 && child2)
+                this.children[i] = child1.merge(child2);
+            else if (!child1 && child2) {
+                this.children[i] = child2;
+            }
+            this.children[i].parent = this;
+        }
+        this.child = this.children && this.children[0];
+
+        return this;
+    }
+
+    walk(handlers, context) {
+        handlers.forEach((handle) => handle(this, context));
+        this.children && this.children.forEach((child) => child && child.walk(handlers, context));
+    }
 }
 
 export default UINode;

@@ -1,0 +1,114 @@
+{
+    "version": "0.3.0",
+    "model": {
+        "azName": "cn-east-1a",
+        "createType": "normal",
+        "name": "",
+        "format": null,
+        "type": "CloudSsd",
+        "snapshot": null,
+        "volume": 10
+    },
+    "uiSchema": {
+        "tag": "u-form",
+        "ref": "form",
+        "gap": "large",
+        "children": [{
+            "label": "可用区",
+            "name": "azName",
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "value": "cn-east-1a", "text": "可用区 A" },
+                    { "value": "cn-east-1b", "text": "可用区 B", "exist": false }
+                ]
+            }
+        }, {
+            "label": "创建方式",
+            "name": "createType",
+            "child": {
+                "tag": "u-radios",
+                "children": [
+                    { "text": "直接创建", "value": "normal" },
+                    { "text": "从快照创建", "value": "snapshot" }
+                ]
+            }
+        }, {
+            "label": "名称",
+            "name": "name",
+            "required": true,
+            "child": {
+                "tag": "u-input",
+                "size": "huge",
+                "placeholder": "1-32位小写字母、数字、或中划线组成，以字母开头，字母或数字结尾",
+                "maxlength": 32,
+                "maxlength-message": "不得超过32个字符"
+            }
+        }, {
+            "label": "适用范围",
+            "name": "format",
+            "required": true,
+            "description": "面向容器服务的云硬盘默认格式化成 Ext4，面向云服务器的云硬盘需自行挂载后执行 mount 操作才能成功挂载",
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "text": "面向容器服务", "value": "NCS" },
+                    { "text": "面向云服务器", "value": "NVM" }
+                ]
+            }
+        }, {
+            "label": "类型",
+            "name": "type",
+            "ref": "type",
+            "exist": false,
+            "required": true,
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "text": "SSD 云盘", "value": "CloudSsd" },
+                    { "text": "高性能 SSD 云盘", "value": "CloudHighPerformanceSsd", "ref": "CHPS", "directives": [{
+                        "name": "tooltip",
+                        "value": "不支持快照功能",
+                        "modifiers": { "top": true }
+                    }] }
+                ]
+            }
+        }, {
+            "label": "来源快照",
+            "name": "snapshot",
+            "ref": "snapshot",
+            "exist": false,
+            "required": true,
+            "child": {
+                "tag": "u-select",
+                "size": "large medium",
+                "data": [
+                    { "text": "暂无快照" }
+                ],
+                "comment": "async"
+            }
+        }, {
+            "label": "容量",
+            "name": "volume",
+            "ref": "volume",
+            "required": true,
+            "child": {
+                "tag": "u-combo-slider",
+                "min": 10,
+                "max": 4000,
+                "unit": "GB",
+                "step": 10,
+                "precision": 10,
+                "tip": "步长为10GB"
+            }
+        }, {
+            "label": "",
+            "ref": "buttons",
+            "child": {
+                "tag": "u-button",
+                "color": "primary",
+                "text": "立即创建"
+            }
+        }]
+    }
+}

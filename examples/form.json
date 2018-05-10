@@ -1,13 +1,12 @@
 {
-    "version": "0.2.0",
+    "version": "0.3.0",
     "model": {
-        "chargeType": 1,
         "azName": "cn-east-1a",
         "createType": "normal",
         "name": "",
-        "format": "",
+        "format": null,
         "type": "CloudSsd",
-        "snapshot": "",
+        "snapshot": null,
         "volume": 10,
         "purchasePeriod": 1,
         "AutoRenew": false,
@@ -15,13 +14,9 @@
     },
     "uiSchema": {
         "tag": "u-form",
+        "ref": "form",
+        "gap": "large",
         "children": [{
-            "label": "计费方式",
-            "name": "chargeType",
-            "ref": "chargeType",
-            "required": true,
-            "child": "u-charge-type-radios"
-        }, {
             "label": "可用区",
             "name": "azName",
             "child": {
@@ -47,6 +42,7 @@
             "required": true,
             "child": {
                 "tag": "u-input",
+                "size": "huge",
                 "placeholder": "1-32位小写字母、数字、或中划线组成，以字母开头，字母或数字结尾",
                 "maxlength": 32,
                 "maxlength-message": "不得超过32个字符"
@@ -66,6 +62,7 @@
         }, {
             "label": "类型",
             "name": "type",
+            "ref": "type",
             "required": true,
             "child": {
                 "tag": "u-capsules",
@@ -85,6 +82,7 @@
             "required": true,
             "child": {
                 "tag": "u-select",
+                "size": "large medium",
                 "data": [
                     { "text": "暂无快照" }
                 ],
@@ -105,68 +103,13 @@
                 "tip": "步长为10GB"
             }
         }, {
-            "label": "购买时长",
-            "name": "purchasePeriod",
-            "ref": "purchasePeriod",
-            "required": true,
-            "child": "u-purchase-period-capsules"
-        }, {
-            "label": "自动续订",
-            "name": "AutoRenew",
-            "ref": "AutoRenew",
-            "exist": false,
-            "description": "开启自动续订后，实例到期前7天会按照你选择的时长自动续订一个周期，余额不足时会续订失败",
-            "child": {
-                "tag": "u-radios",
-                "children": [
-                    { "text": "开启", "value": true },
-                    { "text": "不开启", "value": false }
-                ]
-            }
-        }, {
             "label": "",
-            "name": "AutoRenewPeriod",
-            "ref": "AutoRenewPeriod",
-            "exist": false,
-            "child": "u-purchase-period-capsules"
-        }, {
-            "child": "u-purchase-summary-card"
+            "ref": "buttons",
+            "child": {
+                "tag": "u-button",
+                "color": "primary",
+                "text": "立即创建"
+            }
         }]
-    },
-    "dependencies": [{
-        "$ref": "purchasePeriod",
-        "prop": "exist",
-        "depend": {
-            "model.chargeType": 0
-        }
-    }, {
-        "$ref": "snapshot",
-        "prop": "exist",
-        "depend": {
-            "model.createType": "snapshot"
-        }
-    }, {
-        "$ref": "CHPS",
-        "prop": "disabled",
-        "depend": [{
-            "model.createType": "snapshot"
-        }, {
-            "model.azName": "cn-east-1a",
-            "!gray.nbsvolumeLabels['cn-east-1a']": 1
-        }]
-    }, {
-        "$ref": "volume.child",
-        "prop": "disabled",
-        "depend": {
-            "model.createType": "snapshot"
-        }
-    }, { "$ref": "AutoRenew", "prop": "exist", "depend": { "model.chargeType": 0 } },
-    { "$ref": "AutoRenewPeriod", "prop": "exist", "depend": { "model.AutoRenew": true } }],
-    "grayDependencies": [{
-        "$ref": "CHPS",
-        "prop": "exist",
-        "depend": {
-            "gray.nbsvolume": 1
-        }
-    }]
+    }
 }

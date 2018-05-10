@@ -1,0 +1,11 @@
+{
+    "version": "0.3.0",
+    "uiRefs": {
+        "cnEast1b": {
+            "exist": false
+        },
+        "CHPS": {
+            "exist": false
+        }
+    }
+}

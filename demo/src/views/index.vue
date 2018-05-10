@@ -3,10 +3,11 @@
     <aside :class="$style.side">
         <u-sidebar>
             <u-sidebar-item>首页</u-sidebar-item>
-            <u-sidebar-item>简单</u-sidebar-item>
-            <u-sidebar-item>依赖联动</u-sidebar-item>
-            <u-sidebar-divider></u-sidebar-divider>
-            <u-sidebar-item>表单</u-sidebar-item>
+            <u-sidebar-item to="/simple">简单示例</u-sidebar-item>
+            <u-sidebar-item to="/form">表单示例</u-sidebar-item>
+            <u-sidebar-item to="/exist">控制显隐</u-sidebar-item>
+            <u-sidebar-item to="/dep">依赖联动</u-sidebar-item>
+            <u-sidebar-item to="/merge">无限合并</u-sidebar-item>
         </u-sidebar>
     </aside>
     <main :class="$style.main">

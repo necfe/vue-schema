@@ -3,8 +3,8 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 import * as Components from 'library';
-import { installComponents } from 'vusion-utils';
-installComponents(Components, Vue);
+import { install } from 'vusion-utils';
+install(Components, Vue);
 
 import routes from './routes';
 

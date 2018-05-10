@@ -4,6 +4,7 @@ const VUE_RESERVED_WORDS = 'class,style,attrs,props,domProps,on,nativeOn,directi
 export default {
     data() {
         return {
+            model: {},
             uiSchema: undefined,
             uiRefs: undefined,
         };

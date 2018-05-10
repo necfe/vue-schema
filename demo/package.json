@@ -6,7 +6,7 @@
     "cloud-ui.vusion": "~0.3.0",
     "vue": "^2.5.0",
     "vue-router": "^3.0.0",
-    "vusion-utils": "^0.1.0"
+    "vusion-utils": "^0.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

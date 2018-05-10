@@ -1,60 +1,24 @@
+import at from 'lodash/at';
 import UINode from './UINode';
-import merge from 'lodash/merge';
 
-const SIMPLE_WORDS = 'tag,text,bindingText,slot,key,ref'.split(',');
-const OBJECT_WORDS = 'class,style,attrs,bindingAttrs,props,domProps,on,nativeOn,directives,scopedSlots,others'.split(',');
-const ARRAY_WORDS = 'directives'.split(',');
-
-function _merge(schema1, schema2) {
-    const schema = {
-        model: Object.assign({}, schema1.model, schema2.model),
-        uiSchema: undefined,
-        dependencies: [].concat(schema1.dependencies, schema2.dependencies),
-        watchers: [].concat(schema1.watchers, schema2.watchers),
-    };
-
-    const vueSchema = new VueSchema(schema);
-    vueSchema.uiSchema = (schema1.uiSchema && schema2.uiSchema) ? _mergeUI(schema1.uiSchema, schema2.uiSchema) : (schema1.uiSchema || schema2.uiSchema);
-    vueSchema.uiRefs = {};
-    vueSchema.uiSchema && VueSchema.handleUI(vueSchema.uiSchema, [
-        (ui) => {
-            if (ui.ref)
-                vueSchema.uiRefs[ui.ref] = ui;
-        },
-    ]);
-    return vueSchema;
-}
-
-function _mergeUI(ui1, ui2, parent) {
-    const ui = {};
-
-    // 允许后者将前者的tag直接覆盖
-    SIMPLE_WORDS.forEach((word) => ui[word] = ui2[word] || ui1[word]);
-    OBJECT_WORDS.forEach((word) => ui[word] = merge({}, ui1[word], ui2[word]));
-    ARRAY_WORDS.forEach((word) => ui[word] = [].concat(ui1[word] || [], ui2[word] || []));
-
-    const uiNode = new UINode(ui, parent);
-
-    const children = [];
-    const maxLength = Math.max(ui1.children.length, ui2.children.length);
-
-    for (let i = 0; i < maxLength; i++) {
-        const child1 = ui1.children[i];
-        const child2 = ui2.children[i];
-
-        if (child1 && child2)
-            children[i] = _mergeUI(child1, child2, uiNode);
-        else if (!child1 && !child2)
-            ; // ignore
-        else
-            children[i] = new UINode(child2 || child1, uiNode);
-    }
-
-    uiNode.children = children;
-    uiNode.child = children && children[0];
-
-    return uiNode;
-}
+/**
+ *
+ * @param {*} condition
+ * 数组为或，对象为与，不允许有函数
+ */
+const resolveCondition = (condition, context) => {
+    if (Array.isArray(condition))
+        return condition.some((cond) => resolveCondition(cond, context));
+    else if (typeof condition === 'object') {
+        return Object.keys(condition).every((key) => {
+            if (key[0] === '!')
+                return at(context, key.slice(1))[0] !== condition[key];
+            else
+                return at(context, key)[0] === condition[key];
+        });
+    } else
+        return !!condition;
+};
 
 class VueSchema {
     // version: string;
@@ -75,8 +39,9 @@ class VueSchema {
         this.model = model;
 
         this.uiSchema = schema.uiSchema && new UINode(schema.uiSchema);
+        this._uiRefs = schema.uiRefs;
         this.uiRefs = {};
-        this.uiSchema && VueSchema.handleUI(this.uiSchema, [
+        this.uiSchema && this.uiSchema.walk([
             (ui) => {
                 if (ui.ref)
                     this.uiRefs[ui.ref] = ui;
@@ -87,21 +52,114 @@ class VueSchema {
         this.watchers = schema.watchers || [];
     }
 
-    static merge(...schemas) {
-        return schemas.reduce((schema1, schema2) => _merge(schema1, schema2));
+    merge(schema) {
+        Object.assign(this.model, schema.model);
+        this.dependencies = this.dependencies.concat(schema.dependencies);
+        this.watchers = this.watchers.concat(schema.watchers);
+
+        if (schema.uiSchema)
+            this.uiSchema.merge(schema.uiSchema);
+
+        if (schema._uiRefs) {
+            Object.keys(schema._uiRefs).forEach((key) => {
+                this.uiRefs[key].merge(new UINode(schema._uiRefs[key]));
+            });
+        }
+
+        this.uiSchema && this.uiSchema.walk([
+            (ui) => {
+                if (ui.ref)
+                    this.uiRefs[ui.ref] = ui;
+            },
+        ]);
+
+        return this;
     }
 
     /**
-     *
-     * @param {*} config
-     * @param {*} handlers
-     * 使用call(this, )
-     * @TODO: 考虑要不要不用这种方式
-     * @TODO: 考虑改成 walk
+     * 初始化组件
+     * @param {*} options.handlers 初始化的都比较优先
+     * @param {*} options.watchers 初始化的都比较优先
+     * @param {*} context 上下文，一般为组件实例 this
      */
-    static handleUI(ui, handlers) {
-        handlers.forEach((handle) => handle.call(this, ui));
-        ui.children && ui.children.forEach((child) => child && VueSchema.handleUI.call(this, child, handlers));
+    initialize(options = {}, context) {
+        // 必须先放，因为处理handlers的时候要获取里面的数据
+        context.model = this.model;
+
+        // 处理handles
+        options.handlers && this.uiSchema.walk(options.handlers, context);
+
+        // 转换dependencies
+        // @DONE: 考虑将bindings转换为watch的形式
+        this.dependencies.forEach((dep) => {
+            // @DONE: 有两种类型的dep
+            // @DONE: 支持$path查找路径
+
+            if (!(dep.$ref || dep.$path))
+                return console.warn('依赖没有$ref或$path属性', dep);
+
+            let binding;
+            if (dep.depend) {
+                binding = () => resolveCondition(dep.depend, {
+                    model: context.model,
+                    gray: window.backend ? window.backend.grayDeploy : {},
+                });
+            } else if (dep.if) {
+                binding = () => resolveCondition(dep.if.condition, {
+                    model: context.model,
+                    gray: window.backend ? window.backend.grayDeploy : {},
+                }) ? dep.if.then : dep.if.else;
+            }
+
+            const ui = dep.$path ? at(this.uiSchema, dep.$path)[0] : at(this.uiRefs, dep.$ref)[0];
+            if (!ui)
+                return console.warn('找不到对应的依赖路径', dep);
+
+            ui.bindingAttrs[dep.prop] = binding;
+            // this.watchers.push([
+            //     binding,
+            //     (value) => {
+            //         ui.attrs[dep.prop] = value;
+            //     },
+            // ]);
+        });
+
+        // binding的属性处理要在observe之前完成
+        let watchers = [];
+        this.uiSchema.walk([
+            // 添加watchers，watcher比直接在render中算一遍性能好
+            function (ui) {
+                // 保证这两种属性的添加，要observe才能生效
+                if (ui.attrs.disabled === undefined)
+                    ui.attrs.disabled = undefined;
+                if (ui.attrs.exist === undefined)
+                    ui.attrs.exist = undefined;
+                if (ui.attrs.hidden === undefined)
+                    ui.attrs.hidden = undefined;
+                if (ui.text === undefined)
+                    ui.text = undefined;
+
+                Object.keys(ui.bindingAttrs).forEach((attr) => {
+                    if (ui.attrs[attr] === undefined)
+                        ui.attrs[attr] = undefined;
+                    watchers.push([
+                        ui.bindingAttrs[attr],
+                        (value) => ui.attrs[attr] = value,
+                    ]);
+                });
+
+                ui.bindingText && watchers.push([
+                    ui.bindingText,
+                    (value) => ui.text = value,
+                ]);
+            },
+        ], context);
+
+        context.uiSchema = this.uiSchema;
+        context.uiRefs = this.uiRefs;
+
+        watchers = [].concat(options.watchers || [], watchers, this.watchers);
+        watchers.forEach((watcher) => context.$watch(watcher[0], watcher[1], { immediate: true }));
     }
 }
 
