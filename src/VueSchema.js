@@ -42,10 +42,7 @@ class VueSchema {
         this._uiRefs = schema.uiRefs;
         this.uiRefs = {};
         this.uiSchema && this.uiSchema.walk([
-            (ui) => {
-                if (ui.ref)
-                    this.uiRefs[ui.ref] = ui;
-            },
+            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui),
         ]);
 
         this.dependencies = [].concat(schema.dependencies || [], schema.grayDependencies || []);
@@ -62,15 +59,18 @@ class VueSchema {
 
         if (schema._uiRefs) {
             Object.keys(schema._uiRefs).forEach((key) => {
-                this.uiRefs[key].merge(new UINode(schema._uiRefs[key]));
+                let uiNode = schema._uiRefs[key];
+                // 强制删除
+                if (uiNode === false) {
+                    uiNode = { exist: false };
+                    this.dependencies.forEach((dep, index) => dep.$ref === key && dep.splice(index, 1));
+                }
+                this.uiRefs[key].merge(new UINode(uiNode));
             });
         }
 
         this.uiSchema && this.uiSchema.walk([
-            (ui) => {
-                if (ui.ref)
-                    this.uiRefs[ui.ref] = ui;
-            },
+            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui),
         ]);
 
         return this;
