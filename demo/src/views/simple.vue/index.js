@@ -1,5 +1,5 @@
 import VueSchema from 'vue-schema';
-import SchemaBase from 'vue-schema/src/schema-base.vue';
+import SchemaBase from 'vue-schema/src/base.vue';
 import data from '../../../../examples/simple.json';
 
 export default {
