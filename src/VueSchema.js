@@ -63,7 +63,7 @@ class VueSchema {
                 // 强制删除
                 if (uiNode === false) {
                     uiNode = { exist: false };
-                    this.dependencies.forEach((dep, index) => dep.$ref === key && dep.splice(index, 1));
+                    this.dependencies.forEach((dep, index) => dep.$ref === key && this.dependencies.splice(index, 1));
                 }
                 this.uiRefs[key].merge(new UINode(uiNode));
             });
