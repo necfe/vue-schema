@@ -65,7 +65,11 @@ class VueSchema {
                     uiNode = { exist: false };
                     this.dependencies.forEach((dep, index) => dep.$ref === key && this.dependencies.splice(index, 1));
                 }
-                this.uiRefs[key].merge(new UINode(uiNode));
+
+                if (!this.uiRefs[key])
+                    console.warn(`[WARNING] Cannot find '${key}' in uiRefs when merging.`);
+                else
+                    this.uiRefs[key].merge(new UINode(uiNode));
             });
         }
 
