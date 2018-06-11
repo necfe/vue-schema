@@ -105,11 +105,15 @@ class VueSchema {
             let binding;
             if (dep.depend) {
                 binding = () => resolveCondition(dep.depend, {
+                    schema: this,
+                    this: context,
                     model: context.model,
                     gray: window.backend ? window.backend.grayDeploy : {},
                 });
             } else if (dep.if) {
                 binding = () => resolveCondition(dep.if.condition, {
+                    schema: this,
+                    this: context,
                     model: context.model,
                     gray: window.backend ? window.backend.grayDeploy : {},
                 }) ? dep.if.then : dep.if.else;

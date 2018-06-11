@@ -21,7 +21,7 @@ VueSchema 是一种可以用 JSON 或 JS Object 来表示 Vue 组件的规范。
 ``` js
 class VueSchema {
     version: string;            // 当前配置所使用的规范版本
-    model: Object;              // 表单页面中使用。表单中的字段
+    model: Object;              // 表单中的字段，通常在表单页面中使用。内部的属性会被双向绑定
     uiSchema: UINode;           // UISchema，它表示整个组件的结构，可以取代 Vue template。由 UINode 类型递归表示
     dependencies: Array;        // 组件间的依赖关系
     grayDependencies: Array;    // 使用灰测的依赖关系，与 dependencies 无异
@@ -180,7 +180,7 @@ Condition 类型用于表示复合型的布尔计算。
 - 当它为一个对象时，结果按照对象中的各值进行“与”运算
 - 当它为一个数组时，结果按照数组中的各值进行“或”运算
 - 当它为一个简单类型时，结果直接将它转换为布尔值
-- 对象中的键是一个 JSON 路径，如：`gray.nbsvolumeLabels['cn-east-1a']`。目前开头只支持两种：`model`和`gray`，表示表单数据和灰测对象。 @TODO
+- 对象中的键是一个 JSON 路径，如：`gray.nbsvolumeLabels['cn-east-1a']`。目前开头支持四种类型：`model`, `gray`, `this`和`schema`，分别表示表单数据、灰测对象、Vue 实例和当前配置。
 - 如果这个键开头加`!`，则会对结果进行“非”运算
 
 下面为一个复杂的例子：
@@ -189,7 +189,7 @@ Condition 类型用于表示复合型的布尔计算。
 [{
     "model.createType": "snapshot"
 }, {
-    "model.azName": "cn-east-1a",
+    "this.model.azName": "cn-east-1a",
     "!gray.nbsvolumeLabels['cn-east-1a']": 1
 }]
 ```

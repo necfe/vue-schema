@@ -133,7 +133,7 @@
         "$ref": "volume.child",
         "prop": "disabled",
         "depend": {
-            "model.createType": "snapshot"
+            "this.model.createType": "snapshot"
         }
     },
     { "$ref": "AssociatePublicIpAddress", "prop": "exist", "depend": { "model.ZoneId": "cn-east-1b" } },
