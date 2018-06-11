@@ -1,0 +1,40 @@
+{
+    "version": "0.3.0",
+    "model": {
+        "regionId": "cn-east-1"
+    },
+    "uiSchema": {
+        "tag": "u-sidebar",
+        "ref": "sidebar",
+        "children": [
+            { "text": "总览" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "容器服务" },
+            { "text": "云服务器" },
+            { "text": "镜像仓库" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "VPC" },
+            { "text": "负载均衡" },
+            { "text": "弹性公网 IP" },
+            { "text": "私有 DNS" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "RDS" },
+            { "text": "MongoDB" },
+            { "text": "Redis" },
+            { "text": "Elasticsearch" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "消息队列" },
+            { "text": "Kafka" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "云硬盘" },
+            { "text": "对象存储" },
+            { "text": "CDN" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "DDoS 基础防护" },
+            { "text": "SSL 证书" },
+            { "tag": "u-sidebar-divider" },
+            { "text": "访问控制" },
+            { "text": "报警管理" }
+        ]
+    }
+}
