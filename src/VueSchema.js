@@ -123,13 +123,10 @@ class VueSchema {
             if (!ui)
                 return console.warn('找不到对应的依赖路径', dep);
 
-            ui.bindingAttrs[dep.prop] = binding;
-            // this.watchers.push([
-            //     binding,
-            //     (value) => {
-            //         ui.attrs[dep.prop] = value;
-            //     },
-            // ]);
+            if (dep.prop || dep.attr)
+                ui.bindingAttrs[dep.prop || dep.attr] = binding;
+            if (dep.text)
+                ui.bindingText = binding;
         });
 
         // binding的属性处理要在observe之前完成
