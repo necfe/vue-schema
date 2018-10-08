@@ -1,13 +1,13 @@
 import at from 'lodash/at';
-// import merge from 'lodash/merge';
+// import merge from 'lodash/merge'
 
-const VUE_RESERVED_WORDS = 'class,style,attrs,props,domProps,on,nativeOn,directives,scopedSlots,slot,key,ref'.split(',');
-const SCHEMA_RESERVED_WORDS = 'tag,bindingAttrs,bindingText,parent,child,children,text,others'.split(',');
-const SIMPLE_WORDS = 'tag,text,bindingText,slot,key,ref'.split(',');
-const OBJECT_WORDS = 'class,style,attrs,bindingAttrs,props,domProps,on,nativeOn,directives,scopedSlots,others'.split(',');
-const ARRAY_WORDS = 'directives'.split(',');
+const VUE_RESERVED_WORDS: Array<string> = 'class,style,attrs,props,domProps,on,nativeOn,directives,scopedSlots,slot,key,ref'.split(',');
+const SCHEMA_RESERVED_WORDS: Array<string> = 'tag,bindingAttrs,bindingText,parent,child,children,text,others'.split(',');
+const SIMPLE_WORDS: Array<string> = 'tag,text,bindingText,slot,key,ref'.split(',');
+const OBJECT_WORDS: Array<string> = 'class,style,attrs,bindingAttrs,props,domProps,on,nativeOn,directives,scopedSlots,others'.split(',');
+const ARRAY_WORDS: Array<string> = 'directives'.split(',');
 
-const guessChildName = (name) => {
+const guessChildName = (name: string): string => {
     if (name.endsWith('s'))
         return name.slice(0, -1);
     else if (name.endsWith('es'))
@@ -16,30 +16,33 @@ const guessChildName = (name) => {
         return name + '-item';
 };
 
-class UINode {
-    // tag: string;
-    // parent: UINode;
-    // child: UINode;
-    // children: Array<UINode>;
-    // text: string;
-    // others: Object;
-    // bindingAttrs: Object;
-    // bindingText: Function;
+interface UINodeFace {
+    tag: string;
+    parent: UINodeFace | any;
+    child: UINodeFace | any;
+    children: Array<UINodeFace>;
+    text: string;
+    others: { [key: string]: any };
+    bindingAttrs: { [key: string]: any };
+    bindingText: Function;
+    class: string;
+    attrs: { [key: string]: any };
+    merge (ui: any);
+    walk (handlers: any[], context: any);
+}
 
-    // class: string;
-    // style: ;
-    // attrs: ;
-    // props,
-    // domProps,
-    // on,
-    // nativeOn,
-    // directives,
-    // scopedSlots,
-    // slot,
-    // key,
-    // ref
-
-    constructor(ui, parent) {
+class UINode implements UINodeFace {
+    tag: string;
+    parent: UINodeFace | any;
+    child: UINodeFace | any;
+    children: Array<UINodeFace>;
+    text: string;
+    others: { [key: string]: any };
+    bindingAttrs: { [key: string]: any };
+    bindingText: Function;
+    class: string;
+    attrs: { [key: string]: any };
+    constructor (ui: any, parent?: any) {
         // @TODO: 先不处理自己处理自己的情况
 
         if (!ui.tag && parent)
@@ -60,14 +63,13 @@ class UINode {
         this.bindingText = ui.bindingText;
 
         Object.keys(ui).forEach((key) => {
-            if (!(VUE_RESERVED_WORDS.includes(key) || SCHEMA_RESERVED_WORDS.includes(key))) {
+            if (!(VUE_RESERVED_WORDS.includes(key) || SCHEMA_RESERVED_WORDS.includes(key)))
                 if (key === ':text')
                     this.bindingText = ui[key];
                 else if (key[0] === ':')
                     this.bindingAttrs[key.slice(1)] = ui[key];
                 else
                     this.attrs[key] = ui[key];
-            }
         });
 
         let children = ui.children || [];
@@ -87,22 +89,22 @@ class UINode {
     }
 
     // get exist() {
-    //     const exist = this.attrs.exist;
-    //     return exist !== undefined && !!exist === false;
+    //     const exist = this.attrs.exist
+    //     return exist !== undefined && !!exist === false
     // }
 
     // get hasChild() {
-    //     return !!(this.children && this.children.length);
+    //     return !!(this.children && this.children.length)
     // }
 
-    merge(ui) {
-        // return merge(this, ui);
+    merge (ui: any) {
+        // return merge(this, ui)
         // 允许后者将前者的tag直接覆盖
         SIMPLE_WORDS.forEach((word) => this[word] = ui[word] === undefined ? this[word] : ui[word]);
         OBJECT_WORDS.forEach((word) => this[word] = Object.assign({}, this[word], ui[word]));
         ARRAY_WORDS.forEach((word) => this[word] = [].concat(this[word] || [], ui[word] || []));
 
-        // const uiNode = new UINode(ui, parent);
+        // const uiNode = new UINode(ui, parent)
 
         const maxLength = Math.max(this.children.length, ui.children.length);
 
@@ -112,9 +114,9 @@ class UINode {
 
             if (child1 && child2)
                 this.children[i] = child1.merge(child2);
-            else if (!child1 && child2) {
+            else if (!child1 && child2)
                 this.children[i] = child2;
-            }
+
             this.children[i].parent = this;
         }
         this.child = this.children && this.children[0];
@@ -122,7 +124,7 @@ class UINode {
         return this;
     }
 
-    walk(handlers, context) {
+    walk (handlers: any[], context?: any) {
         handlers.forEach((handle) => handle(this, context));
         this.children && this.children.forEach((child) => child && child.walk(handlers, context));
     }

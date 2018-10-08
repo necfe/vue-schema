@@ -1,0 +1,12 @@
+{
+  "extends": "tslint-config-standard",
+  "globals": {
+    "require": true
+  },
+  "rules": {
+    "curly": [true, "ignore-same-line"],
+    "indent": [true, "spaces", 4],
+    "ter-indent": [true, 4],
+    "semicolon": [true, "always"],
+  }
+}

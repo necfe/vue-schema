@@ -1,4 +1,4 @@
-import VueSchema from 'vue-schema';
+import VueSchema from '../../../../dist/app';
 import SchemaBase from 'vue-schema/src/base.vue';
 import data from '../../../../examples/exist.json';
 

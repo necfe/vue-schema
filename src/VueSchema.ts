@@ -1,3 +1,6 @@
+// 解决window上挂自定义属性的问题
+declare var window: Window & { backend: any }
+
 import at from 'lodash/at';
 import UINode from './UINode';
 
@@ -6,28 +9,30 @@ import UINode from './UINode';
  * @param {*} condition
  * 数组为或，对象为与，不允许有函数
  */
-const resolveCondition = (condition, context) => {
+const resolveCondition = (condition: any, context: { [key: string]: any }): any => {
     if (Array.isArray(condition))
         return condition.some((cond) => resolveCondition(cond, context));
-    else if (typeof condition === 'object') {
+    else if (typeof condition === 'object')
         return Object.keys(condition).every((key) => {
             if (key[0] === '!')
                 return at(context, key.slice(1))[0] !== condition[key];
             else
                 return at(context, key)[0] === condition[key];
         });
-    } else
+    else
         return !!condition;
 };
 
 class VueSchema {
-    // version: string;
-    // model: Object;
-    // uiSchema: UINode;
-    // dependencies: Array;
-    // watchers: Array;
+    version: string;
+    model: { [key: string]: any };
+    uiSchema: UINode;
+    dependencies: any[];
+    watchers: any[];
+    _uiRefs: any;
+    uiRefs: any;
 
-    constructor(schema) {
+    constructor (schema) {
         this.version = schema.version;
 
         const model = schema.model || {};
@@ -42,14 +47,14 @@ class VueSchema {
         this._uiRefs = schema.uiRefs;
         this.uiRefs = {};
         this.uiSchema && this.uiSchema.walk([
-            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui),
+            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui)
         ]);
 
         this.dependencies = [].concat(schema.dependencies || [], schema.grayDependencies || []);
         this.watchers = schema.watchers || [];
     }
 
-    merge(schema) {
+    merge (schema) {
         Object.assign(this.model, schema.model);
         this.dependencies = this.dependencies.concat(schema.dependencies);
         this.watchers = this.watchers.concat(schema.watchers);
@@ -57,7 +62,7 @@ class VueSchema {
         if (schema.uiSchema)
             this.uiSchema.merge(schema.uiSchema);
 
-        if (schema._uiRefs) {
+        if (schema._uiRefs)
             Object.keys(schema._uiRefs).forEach((key) => {
                 let uiNode = schema._uiRefs[key];
                 // 强制删除
@@ -71,10 +76,9 @@ class VueSchema {
                 else
                     this.uiRefs[key].merge(new UINode(uiNode));
             });
-        }
 
         this.uiSchema && this.uiSchema.walk([
-            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui),
+            (ui) => ui.ref && (this.uiRefs[ui.ref] = ui)
         ]);
 
         return this;
@@ -86,7 +90,7 @@ class VueSchema {
      * @param {*} options.watchers 初始化的都比较优先
      * @param {*} context 上下文，一般为组件实例 this
      */
-    initialize(options = {}, context) {
+    initialize (options: any = {}, context: any) {
         // 必须先放，因为处理handlers的时候要获取里面的数据
         context.model = this.model;
 
@@ -108,14 +112,14 @@ class VueSchema {
                     schema: this,
                     this: context,
                     model: context.model,
-                    gray: window.backend ? window.backend.grayDeploy : {},
+                    gray: window.backend ? window.backend.grayDeploy : {}
                 });
             } else if (dep.if) {
                 binding = () => resolveCondition(dep.if.condition, {
                     schema: this,
                     this: context,
                     model: context.model,
-                    gray: window.backend ? window.backend.grayDeploy : {},
+                    gray: window.backend ? window.backend.grayDeploy : {}
                 }) ? dep.if.then : dep.if.else;
             }
 
