@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        app: './index.ts',
+        'vue-schema': './index.ts',
     },
     output: {
         path: path.resolve(__dirname, './dist/'),

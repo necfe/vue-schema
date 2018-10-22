@@ -108,19 +108,17 @@ class VueSchema {
 
             let binding;
             if (dep.depend) {
-                binding = () => resolveCondition(dep.depend, {
-                    schema: this,
+                binding = () => resolveCondition(dep.depend, Object.assign({
                     this: context,
-                    model: context.model,
+                    schema: this,
                     gray: window.backend ? window.backend.grayDeploy : {}
-                });
+                }, context));
             } else if (dep.if) {
-                binding = () => resolveCondition(dep.if.condition, {
-                    schema: this,
+                binding = () => resolveCondition(dep.if.condition, Object.assign({
                     this: context,
-                    model: context.model,
+                    schema: this,
                     gray: window.backend ? window.backend.grayDeploy : {}
-                }) ? dep.if.then : dep.if.else;
+                }, context)) ? dep.if.then : dep.if.else;
             }
 
             const ui = dep.$path ? at(this.uiSchema, dep.$path)[0] : at(this.uiRefs, dep.$ref)[0];
@@ -151,16 +149,29 @@ class VueSchema {
                 Object.keys(ui.bindingAttrs).forEach((attr) => {
                     if (ui.attrs[attr] === undefined)
                         ui.attrs[attr] = undefined;
+                    let binding = ui.bindingAttrs[attr];
+                    if (typeof binding === 'string') {
+                        binding = Function('schema', 'gray', `with (this) { return ${binding} }`)
+                            .bind(context, this, window.backend ? window.backend.grayDeploy : {});
+                    }
                     watchers.push([
-                        ui.bindingAttrs[attr],
+                        binding,
                         (value) => ui.attrs[attr] = value,
                     ]);
                 });
 
-                ui.bindingText && watchers.push([
-                    ui.bindingText,
-                    (value) => ui.text = value,
-                ]);
+                if (ui.bindingText) {
+                    let binding = ui.bindingText;
+                    if (typeof binding === 'string') {
+                        binding = Function('schema', 'gray', `with (this) { return ${binding} }`)
+                            .bind(context, this, window.backend ? window.backend.grayDeploy : {});
+                    }
+                    console.log(binding);
+                    watchers.push([
+                        binding,
+                        (value) => ui.text = value,
+                    ]);
+                }
             },
         ], context);
 

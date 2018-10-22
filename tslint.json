@@ -7,6 +7,6 @@
     "curly": [true, "ignore-same-line"],
     "indent": [true, "spaces", 4],
     "ter-indent": [true, 4],
-    "semicolon": [true, "always"],
+    "semicolon": [true, "always"]
   }
 }

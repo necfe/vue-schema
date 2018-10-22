@@ -1,0 +1,131 @@
+{
+    "version": "0.3.0",
+    "model": {
+        "ZoneId": "cn-east-1a",
+        "createType": "normal",
+        "name": "",
+        "format": null,
+        "type": "CloudSsd",
+        "snapshot": null,
+        "volume": 10,
+        "AssociatePublicIpAddress": true,
+        "NetworkChargeType": "BANDWIDTH",
+        "InternetMaxBandwidth": 10
+    },
+    "uiSchema": {
+        "tag": "u-form",
+        "ref": "form",
+        "gap": "large",
+        "children": [{
+            "label": "可用区",
+            "name": "ZoneId",
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "value": "cn-east-1a", "text": "可用区 A" },
+                    { "value": "cn-east-1b", "text": "可用区 B" }
+                ]
+            }
+        }, {
+            "label": "创建方式",
+            "name": "createType",
+            "child": {
+                "tag": "u-radios",
+                "children": [
+                    { "text": "直接创建", "value": "normal" },
+                    { "text": "从快照创建", "value": "snapshot" }
+                ]
+            }
+        }, {
+            "label": "类型",
+            "name": "type",
+            "ref": "type",
+            "required": true,
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "text": "SSD 云盘", "value": "CloudSsd" },
+                    { "text": "高性能 SSD 云盘", "value": "CloudHighPerformanceSsd", "ref": "CHPS", "directives": [{
+                        "name": "tooltip",
+                        "value": "不支持快照功能",
+                        "modifiers": { "top": true }
+                    }] }
+                ]
+            }
+        }, {
+            "label": "来源快照",
+            "name": "snapshot",
+            "ref": "snapshot",
+            ":exist": "model.createType === 'snapshot'",
+            "required": true,
+            "child": {
+                "tag": "u-select",
+                "size": "large medium",
+                "data": [
+                    { "text": "暂无快照" }
+                ],
+                "comment": "async"
+            }
+        }, {
+            "label": "容量",
+            "name": "volume",
+            "ref": "volume",
+            "required": true,
+            "child": {
+                "tag": "u-combo-slider",
+                ":disabled": "model.createType === 'snapshot'",
+                "min": 10,
+                "max": 4000,
+                "unit": "GB",
+                "step": 10,
+                "precision": 10,
+                "tip": "步长为10GB"
+            }
+        }, {
+            "label": "公网",
+            "name": "AssociatePublicIpAddress",
+            "ref": "AssociatePublicIpAddress",
+            ":exist": "model.ZoneId === 'cn-east-1b'",
+            "description": "分配的公网 IP 不能解绑，如需自行绑定弹性公网 IP，可选择“不分配”",
+            "child": {
+                "tag": "u-radios",
+                "children": [
+                    { "text": "分配", "value": true },
+                    { "text": "不分配", "value": false }
+                ]
+            }
+        }, {
+            "label": "公网计费模式",
+            "name": "NetworkChargeType",
+            "ref": "NetworkChargeType",
+            ":exist": "model.ZoneId === 'cn-east-1b' && model.AssociatePublicIpAddress === true",
+            "child": {
+                "tag": "u-capsules",
+                "children": [
+                    { "text": "按带宽", "value": "BANDWIDTH" },
+                    { "text": "按流量", "value": "TRAFFIC" }
+                ]
+            }
+        }, {
+            ":label": "model.NetworkChargeType === 'BANDWIDTH' ? '公网带宽' : '最大公网带宽'",
+            "name": "InternetMaxBandwidth",
+            "ref": "InternetMaxBandwidth",
+            ":exist": "model.ZoneId === 'cn-east-1b' && model.AssociatePublicIpAddress === true",
+            "layout": "block",
+            "child": {
+                "tag": "u-combo-slider",
+                "min": 1,
+                "max": 100,
+                "unit": "Mbps"
+            }
+        }, {
+            "label": "",
+            "ref": "buttons",
+            "child": {
+                "tag": "u-button",
+                "color": "primary",
+                ":text": "$route.path"
+            }
+        }]
+    }
+}

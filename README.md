@@ -131,13 +131,22 @@ class UINode {
 
 ### 动态绑定属性
 
-这个功能类似于 Vue Template 中的`v-bind:attr`，只需属性名前加个冒号，值为一个函数即可。目前仅能用于 JS Object 中 @TODO。
+这个功能类似于 Vue Template 中的`v-bind:attr`，只需属性名前加个冒号，值为一个函数。
 
 ``` js
 {
     ':disabled': () => this.canSubmit
 }
 ```
+
+v0.4.0 之后，支持字符串表达式，这样在 JSON 中也可以方便地使用。
+
+``` json
+":disabled": "this.canSubmit"
+```
+
+类似 Vue Template，this 也可以省略。
+
 
 ### 依赖项控制联动
 
@@ -180,7 +189,7 @@ Condition 类型用于表示复合型的布尔计算。
 - 当它为一个对象时，结果按照对象中的各值进行“与”运算
 - 当它为一个数组时，结果按照数组中的各值进行“或”运算
 - 当它为一个简单类型时，结果直接将它转换为布尔值
-- 对象中的键是一个 JSON 路径，如：`gray.nbsvolumeLabels['cn-east-1a']`。目前开头支持四种类型：`model`, `gray`, `this`和`schema`，分别表示表单数据、灰测对象、Vue 实例和当前配置。
+- 对象中的键是一个 JSON 路径，如：`gray.nbsvolumeLabels['cn-east-1a']`。上下文支持：`schema`（当前配置）、`gray`（灰测对象）、`this`（Vue 实例）以及`this`中的所有属性。
 - 如果这个键开头加`!`，则会对结果进行“非”运算
 
 下面为一个复杂的例子：
@@ -219,3 +228,16 @@ uiSchema 的合并有两种方式。
 #### 根据 uiSchema
 
 #### 根据 uiRefs
+
+## 构建
+
+``` shell
+npm run build
+```
+
+## 开发
+
+``` shell
+cd demo
+vusion dev
+```

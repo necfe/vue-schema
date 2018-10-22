@@ -1,6 +1,6 @@
 import VueSchema from '../../../../dist/vue-schema';
 import SchemaBase from 'vue-schema/src/base.vue';
-import data from '../../../../examples/form.json';
+import data from '../../../../examples/binding.json';
 
 export default {
     extends: SchemaBase,

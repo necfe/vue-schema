@@ -7,6 +7,7 @@
             <u-sidebar-item exact to="/form">表单示例</u-sidebar-item>
             <u-sidebar-item exact to="/exist">控制显隐</u-sidebar-item>
             <u-sidebar-item exact to="/dep">依赖联动</u-sidebar-item>
+            <u-sidebar-item exact to="/binding">动态绑定</u-sidebar-item>
             <u-sidebar-item exact to="/merge">无限合并</u-sidebar-item>
         </u-sidebar>
     </aside>

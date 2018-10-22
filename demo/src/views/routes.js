@@ -4,6 +4,7 @@ import Simple from './simple.vue';
 import Form from './form.vue';
 import Exist from './exist.vue';
 import Dep from './dep.vue';
+import Binding from './binding.vue';
 import Merge from './merge.vue';
 
 export default [
@@ -15,6 +16,7 @@ export default [
         { path: 'form', component: Form },
         { path: 'exist', component: Exist },
         { path: 'dep', component: Dep },
+        { path: 'binding', component: Binding },
         { path: 'merge', component: Merge },
     ] },
 ];
