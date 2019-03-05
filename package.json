@@ -1,5 +1,5 @@
 {
-  "name": "@necfe/vue-schema",
+  "name": "vue-schema",
   "description": "Schema for rendering vue component",
   "version": "0.4.0",
   "author": "Rainfore <rainforest92@126.com>",
@@ -7,6 +7,10 @@
   "scripts": {
     "build": "webpack",
     "precommit": "node node_modules/vusion-hooks/precommit"
+  },
+  "repository": "vusion/icon-font-loader",
+  "bugs": {
+    "url": "http://github.com/vusion/icon-font-loader/issues"
   },
   "license": "MIT",
   "keywords": [
