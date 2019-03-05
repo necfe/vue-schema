@@ -8,9 +8,9 @@
     "build": "webpack",
     "precommit": "node node_modules/vusion-hooks/precommit"
   },
-  "repository": "vusion/icon-font-loader",
+  "repository": "necfe/vue-schema",
   "bugs": {
-    "url": "http://github.com/vusion/icon-font-loader/issues"
+    "url": "http://github.com/necfe/vue-schema/issues"
   },
   "license": "MIT",
   "keywords": [
