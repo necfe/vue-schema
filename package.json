@@ -1,7 +1,7 @@
 {
   "name": "vue-schema",
   "description": "Schema for rendering vue component",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Rainfore <rainforest92@126.com>",
   "main": "./dist/vue-schema.js",
   "scripts": {
